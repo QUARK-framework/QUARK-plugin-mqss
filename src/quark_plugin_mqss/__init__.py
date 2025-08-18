@@ -1,6 +1,6 @@
 from quark.plugin_manager import factory
 
-from quark_plugin_mqss.example_module import ExampleModule
+from quark_plugin_mqss.qlm_mqss import QlmMqss
 
 def register() -> None:
     """
@@ -10,4 +10,4 @@ def register() -> None:
 
     The "module_name" will later be used to refer to the module in the configuration file.
     """
-    factory.register("example_module", ExampleModule)
+    factory.register("qlm_mqss", QlmMqss)

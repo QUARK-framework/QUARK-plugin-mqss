@@ -3,15 +3,11 @@ from time import sleep
 from typing import override
 import os
 
-from quark.core import Core, Data, Result
+from quark.core import Core, Data, Result, Sleep
 from quark.interface_types import InterfaceType, Other
 
 from qiskit import QuantumCircuit
 from mqss.qiskit_adapter import MQSSQiskitAdapter
-
-from qat.lang.AQASM import Program, H, CNOT
-from qat.interop.qiskit import qlm_to_qiskit
-
 
 lrz_token = os.getenv("LRZ_API_TOKEN")
 
@@ -31,43 +27,26 @@ class QlmMqss(Core):
         backend = adapter.get_backend("QLM")
 
         # For testing
-        # circuit = QuantumCircuit(2, 2)
-        # circuit.h(0)
-        # circuit.cx(0, 1)
-        # circuit.measure([0, 1], [0, 1])
-        # job = backend.run(circuit, shots=1000)
-        ### From https://myqlm.github.io/05_demos.html
-        # Create a Program
-        qprog = Program()
-        # Number of qbits
-        nbqbits = 2
-        # Allocate some qbits
-        qbits = qprog.qalloc(nbqbits)
-
-        # Apply some quantum Gates
-        qprog.apply(H, qbits[0])
-        qprog.apply(CNOT, qbits[0], qbits[1])
-
-        # Export this program into a quantum circuit
-        circuit = qprog.to_circ()
-        qiskit_circuit = qlm_to_qiskit(circuit)
-        # And display it!
-        # circuit.display()
-        job = backend.run(qiskit_circuit, shots=1000)
-
-        print(job.result().get_results())
-        return Data(Other(job))
+        circuit = QuantumCircuit(2, 2)
+        circuit.h(0)
+        circuit.cx(0, 1)
+        circuit.measure([0, 1], [0, 1])
+        # print(circuit)
+        self.job = backend.run(circuit, shots=1000, qasm3=False)
+        sleep(10) # Hardcoded sleep to wait until job ran through, will be handled by QUARK automatically in the future.
+        return Data(Other(self.job))
 
     @override
     def postprocess(self, job: Other) -> Result:
-        status = job.status()
-        print("Job status:", status)
-        if status == "COMPLETED":
-            result = job.result()
-            counts = result.get_counts()
-            result_dict = job.result().to_dict()
-            print("Counts:", counts)
+        status = self.job.status()
+        if str(status) == "JobStatus.DONE":
+            result_dict = self.job.result().to_dict()
+            self.counts = []
+            for result in result_dict["results"]:
+                self.counts.append(result["data"]["counts"])
         else:
-            sleep(10)
-            self.postprocess(Data(Other(job)))
-        return result_dict
+            return Sleep(self.job) # This is how it will look like when Sleep feature is implemented.
+        return Data(Other(result_dict))
+
+    def get_metrics(self) -> dict:
+        return {"counts": self.counts}

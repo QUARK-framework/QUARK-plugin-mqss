@@ -33,19 +33,14 @@ class QlmMqss(Core):
         circuit.measure([0, 1], [0, 1])
         # print(circuit)
         self.job = backend.run(circuit, shots=1000, qasm3=False)
-        sleep(10) # Hardcoded sleep to wait until job ran through, will be handled by QUARK automatically in the future.
         return Data(Other(self.job))
 
     @override
     def postprocess(self, job: Other) -> Result:
-        status = self.job.status()
-        if str(status) == "JobStatus.DONE":
-            result_dict = self.job.result().to_dict()
-            self.counts = []
-            for result in result_dict["results"]:
-                self.counts.append(result["data"]["counts"])
-        else:
-            return Sleep(self.job) # This is how it will look like when Sleep feature is implemented.
+        result_dict = self.job.result().to_dict()
+        self.counts = []
+        for result in result_dict["results"]:
+            self.counts.append(result["data"]["counts"])
         return Data(Other(result_dict))
 
     def get_metrics(self) -> dict:

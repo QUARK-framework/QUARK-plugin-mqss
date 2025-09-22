@@ -1,6 +1,7 @@
 from quark.plugin_manager import factory
 
-from quark_plugin_mqss.qlm_mqss import QlmMqss
+from quark_plugin_mqss.circuit_provider import CircuitProvider
+from quark_plugin_mqss.job_execution import JobExecution
 
 def register() -> None:
     """
@@ -10,4 +11,5 @@ def register() -> None:
 
     The "module_name" will later be used to refer to the module in the configuration file.
     """
-    factory.register("qlm_mqss", QlmMqss)
+    factory.register("circuit_provider", CircuitProvider)
+    factory.register("job_execution", JobExecution)

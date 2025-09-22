@@ -3,6 +3,5 @@ plugins: [
     ]
 
 pipeline: [
-    "qlm_mqss", # replace with your module name (the name given to your module in __init__.py.register())
-    # other modules
+    "circuit_provider", "job_execution"
 ]

@@ -1,7 +1,7 @@
 from quark.plugin_manager import factory
 
-from quark_plugin_mqss.circuit_provider import CircuitProvider
-from quark_plugin_mqss.job_execution import JobExecution
+from quark_plugin_lrz.circuit_provider import CircuitProvider
+from quark_plugin_lrz.job_execution import JobExecution
 
 def register() -> None:
     """

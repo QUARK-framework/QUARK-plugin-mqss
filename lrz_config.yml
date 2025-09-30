@@ -1,5 +1,5 @@
 plugins: [
-    "quark_plugin_mqss"
+    "quark_plugin_lrz"
     ]
 
 pipeline: [

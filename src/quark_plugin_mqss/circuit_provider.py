@@ -2,9 +2,10 @@ from dataclasses import dataclass
 from typing import override
 
 from quark.core import Core, Data, Result
-from quark.interface_types import InterfaceType, Other
+from quark.interface_types import InterfaceType, Circuit, Other
 
 from qiskit import QuantumCircuit
+from qiskit.qasm3 import dumps
 
 @dataclass
 class CircuitProvider(Core):
@@ -17,7 +18,8 @@ class CircuitProvider(Core):
         circuit.h(0)
         circuit.cx(0, 1)
         circuit.measure([0, 1], [0, 1])
-        return Data(Other(circuit))
+
+        return Data(Circuit(dumps(circuit)))
 
     @override
     def postprocess(self, result: Other[dict]) -> Result:

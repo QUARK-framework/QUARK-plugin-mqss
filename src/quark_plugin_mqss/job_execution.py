@@ -3,8 +3,9 @@ from typing import override
 import os
 
 from quark.core import Core, Data, Result
-from quark.interface_types import InterfaceType, Other
+from quark.interface_types import Other, Circuit
 
+import qiskit.qasm3
 from qiskit import QuantumCircuit
 from mqss.qiskit_adapter import MQSSQiskitAdapter
 
@@ -17,8 +18,8 @@ class JobExecution(Core):
     """
 
     @override
-    def preprocess(self, data: Other[QuantumCircuit]) -> Result:
-        circuit = data.data
+    def preprocess(self, data: Circuit) -> Result:
+        circuit = qiskit.qasm3.loads(data.as_qasm_string())
         adapter = MQSSQiskitAdapter(token=lrz_token)
         backend = adapter.get_backend("QLM")
         self.job = backend.run(circuit, shots=1000, qasm3=False)

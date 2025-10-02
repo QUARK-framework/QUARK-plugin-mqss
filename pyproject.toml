@@ -6,10 +6,10 @@ build-backend = "setuptools.build_meta"
 # can be empty if no extra settings are needed, presence enables setuptools-scm
 
 [project.urls]
-Homepage = "https://github.com/QUARK-framework/QUARK-plugin-lrz"
+Homepage = "https://github.com/QUARK-framework/QUARK-plugin-mqss"
 
 [project]
-name = "QUARK-plugin-lrz"
+name = "QUARK-plugin-mqss"
 dynamic = ["version"]
 readme = "README.md"
 requires-python = ">=3.12"

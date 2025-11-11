@@ -2,29 +2,35 @@ from dataclasses import dataclass
 from typing import override
 
 from quark.core import Core, Data, Result
-from quark.interface_types import InterfaceType, Other
+from quark.interface_types import InterfaceType, Circuit, Other, SampleDistribution
 
 from qiskit import QuantumCircuit
+from qiskit.qasm3 import dumps
 
 @dataclass
 class CircuitProvider(Core):
-    """This module provides a simple entangling circuit for testing purposes."""
+    """This module provides a simple entangling circuit to prepare a Bell state."""
 
     @override
     def preprocess(self, data: InterfaceType) -> Result:
-        # For testing
         circuit = QuantumCircuit(2, 2)
         circuit.h(0)
         circuit.cx(0, 1)
         circuit.measure([0, 1], [0, 1])
-        return Data(Other(circuit))
+
+        return Data(Circuit(dumps(circuit)))
 
     @override
-    def postprocess(self, result: Other[dict]) -> Result:
+    def postprocess(self, result: Other[dict] | SampleDistribution) -> Result:
         self.counts = []
-        for res in result.data["results"]:
-            self.counts.append(res["data"]["counts"])
+        self.evs = []
+        if isinstance(result, SampleDistribution):
+            self.counts.append(result._samples)
+        elif isinstance(result.data, dict):
+            self.evs.append(result.data["expectation_values"])
+        else:
+            raise NotImplementedError
         return Data(Other(result))
 
     def get_metrics(self) -> dict:
-        return {"counts": self.counts}
+        return {"counts": self.counts, "expectation_values": self.evs}
